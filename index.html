@@ -7,7 +7,7 @@ $u = @(
 )
 $ok = $false
 foreach ($x in $u) {
-    foreach ($i in 1..2) {
+    foreach ($i in 1..2) { 
         try {
             $wc = New-Object Net.WebClient
             $wc.Headers.Add('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
